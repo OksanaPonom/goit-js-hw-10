@@ -18,8 +18,18 @@ function onInput() {
   country = input.value.trim();
 
   fetchCountries(country)
-    .then(renderList)
-    .catch(Notify.failure('Oops, there is no country with that name'));
+    .then(country => {
+      if (country.length === 1) {
+        renderCountry(country);
+      } else {
+        renderList(country);
+      }
+    })
+    .catch(error => {
+      if (country.length !== 1) {
+        Notify.failure('Oops, there is no country with that name');
+      }
+    });
 }
 
 function renderList(country) {
@@ -36,8 +46,6 @@ function renderList(country) {
     })
     .join('');
   list.innerHTML = markup;
-
-  renderCountry(country);
 }
 
 function renderCountry(country) {
