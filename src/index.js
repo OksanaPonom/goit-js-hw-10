@@ -1,3 +1,56 @@
 import './css/styles.css';
+import debounce from 'lodash.debounce';
+import { fetchCountries } from './fetchCountries';
 
 const DEBOUNCE_DELAY = 300;
+const input = document.querySelector('#search-box');
+const list = document.querySelector('.country-list');
+const countryInfo = document.querySelector('.country-info');
+
+let country = '';
+
+input.addEventListener('input', debounce(onInput, DEBOUNCE_DELAY));
+
+function onInput() {
+  countryInfo.innerHTML = '';
+  list.innerHTML = '';
+  country = input.value.trim();
+
+  fetchCountries(country)
+    .then(renderList)
+    .catch(error => console.log(error));
+}
+
+function renderList(country) {
+  let markup = country
+    .map(elem => {
+      return `<li>
+    <img src=${elem.flags.svg} height="20px" width="40px">
+    <p class='text'>${elem.name.official}</p>
+    </li>`;
+    })
+    .join('');
+  list.innerHTML = markup;
+
+  renderCountry(country);
+}
+
+function renderCountry(country) {
+  if (country.length === 1) {
+    list.innerHTML = '';
+    const newMarkup = `
+    <div class="country-name">
+    <img src="${country[0].flags.svg}" alt="${
+      country[0].name.official
+    } height="30px" width="60px" >
+    <h1>${country[0].name.official}</h1>
+    </div>
+    <ul>
+      <li><b>Capital:</b> ${country[0].capital}</li>
+      <li><b>Population:</b> ${country[0].population}</li>
+      <li><b>Languages:</b> ${Object.values(country[0].languages)}</li>
+    </ul>
+  `;
+    countryInfo.innerHTML = newMarkup;
+  }
+}
