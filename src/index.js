@@ -8,14 +8,16 @@ const input = document.querySelector('#search-box');
 const list = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
 
-let country = '';
-
 input.addEventListener('input', debounce(onInput, DEBOUNCE_DELAY));
 
 function onInput() {
   countryInfo.innerHTML = '';
   list.innerHTML = '';
-  country = input.value.trim();
+  const country = input.value.trim();
+  if (!country) {
+    Notify.warning('Please enter the name of the country');
+    return;
+  }
 
   fetchCountries(country)
     .then(country => {
